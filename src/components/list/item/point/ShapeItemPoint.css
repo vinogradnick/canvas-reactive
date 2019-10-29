@@ -1,0 +1,6 @@
+.point-view {
+  display: inline-flex;
+}
+.point-view .item-view {
+  margin: 5px;
+}
