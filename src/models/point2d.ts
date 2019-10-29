@@ -11,10 +11,10 @@ export default class Point2D {
         this.selected = status;
     }
     get getX() {
-        return this.x - PAGE_SIZE.WIDTH;
+        return this.x - (PAGE_SIZE.WIDTH / 2);
     }
     get getY() {
-        return -1 * (this.y - PAGE_SIZE.HEIGHT);
+        return -1 * (this.y - (PAGE_SIZE.HEIGHT / 2));
     }
     public static centerPoint = (start: Point2D, end: Point2D) =>
         new Point2D((start.x + end.x) / 2, (start.y + end.y) / 2)

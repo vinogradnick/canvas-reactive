@@ -7,4 +7,6 @@ export interface IShape {
     points: Point2D[];
     color: string;
     strokeWidth: number;
+    selected: boolean;
+    groups: number[];
 }

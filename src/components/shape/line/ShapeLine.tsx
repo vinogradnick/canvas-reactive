@@ -1,16 +1,15 @@
-import React from 'react'
+import React, { SyntheticEvent } from 'react'
 import Point2D from '../../../models/point2d'
 import CircleShape from '../circle/CirlceShape';
 import { gachiStore } from '../../../store/shapeStore';
 
 
 interface ShapeLineProps {
+    uuid: string;
     start: Point2D;
     end: Point2D;
     color?: string;
     active?: boolean;
-    moveShape: (e: any) => void;
-
 
 }
 const ShapeLine: React.FC<ShapeLineProps> = (props: ShapeLineProps) => {
@@ -21,50 +20,79 @@ const ShapeLine: React.FC<ShapeLineProps> = (props: ShapeLineProps) => {
     const [isEnd, setEndActive] = React.useState(false);
     const [end, setEnd] = React.useState(props.end);
     const activateLine = (e: any) => {
-        console.log('activated-line')
-        setLineActive(true);
+        console.log(gachiStore.key.get())
+        if (gachiStore.key.get()) {
+            gachiStore.addToGroup(props.uuid);
+            gachiStore.selectObject(props.uuid);
+            setLineActive(true);
+
+        }
+        else {
+            if (!gachiStore.selectedObject()) {
+                gachiStore.selectObject(props.uuid);
+                setLineActive(true);
+            }
+        }
+
+
+
     }
     const moveLineDown = (e: any) => {
-        setLineMoveActive(true);
+        if (activateLine)
+            setLineMoveActive(true);
     }
     const moveLineUp = (e: any) => {
-        setLineMoveActive(false);
+        if (activateLine) {
+            setLineMoveActive(false);
+            gachiStore.moveShape(props.uuid, [start, end]);
+        }
+
     }
     const moveLine = (event: any) => {
-        if (setLineMoveActive && lineActive) {
-            console.log('activated');
-            const center = Point2D.subtraction(start, end);
-            const mousePoint = new Point2D(event.clientX, event.clientY);
-            const delta = Point2D.subtraction(mousePoint, center);
-            console.log(delta);
-            start.plus(delta);
-            end.plus(delta);
-            setEnd(end);
-            setStart(start);
-        }
+        // if (setLineMoveActive && lineActive) {
+        //     console.log('activated');
+        //     const center = Point2D.subtraction(start, end);
+        //     const mousePoint = new Point2D(event.clientX, event.clientY);
+        //     const delta = Point2D.subtraction(mousePoint, center);
+        //     console.log(delta);
+        //     start.plus(delta);
+        //     end.plus(delta);
+        //     // setEnd(end);
+        //     // setStart(start);
+        // }
     }
     const moveStart = (e: any) => {
-        if (isStart) {
+        if (isStart && activateLine) {
             setStart(new Point2D(e.clientX, e.clientY));
+            console.log(start);
+            gachiStore.moveShape(props.uuid, [start, end]);
         }
     }
     const moveStartDown = (event: any) => {
-        setStartActive(true);
+        if (activateLine)
+            setStartActive(true);
     }
     const moveStartUp = (event: any) => {
-        setStartActive(false);
+        if (activateLine)
+            setStartActive(false);
     }
     const moveEnd = (e: any) => {
-        if (isEnd) {
+        if (isEnd && activateLine) {
+
             setEnd(new Point2D(e.clientX, e.clientY));
+            console.log(end);
+            gachiStore.moveShape(props.uuid, [start, end]);
         }
     }
     const moveEndDown = (e: any) => {
-        setEndActive(true);
+        if (activateLine)
+            setEndActive(true);
 
     }
     const moveEndUp = (e: any) => {
-        setEndActive(false);
+        if (activateLine)
+            setEndActive(false);
+
     }
     return <>
         <line

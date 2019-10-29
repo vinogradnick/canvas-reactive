@@ -11,6 +11,8 @@ export function shapeGenerator() {
         type: ShapeTypes.LINE,
         points: [new Point2D(rand(100), rand(100)), new Point2D(rand(PAGE_SIZE.WIDTH - 100), rand(PAGE_SIZE.HEIGHT - 100))],
         color: randomHsl(),
-        strokeWidth: 5
+        strokeWidth: 5,
+        selected: false,
+        groups: []
     }
 }

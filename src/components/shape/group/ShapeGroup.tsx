@@ -9,7 +9,7 @@ function ShapeGroup({ group }: { group: IGroup }) {
 
         <g>
             {groups && groups.map(item => <ShapeGroup key={item.id} group={item} />)}
-            {shapes && shapes.map(shapeSwapper)}
+            {/* {shapes && shapes.map(shapeSwapper)} */}
         </g>
     )
 }
