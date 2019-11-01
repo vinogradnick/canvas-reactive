@@ -1,5 +1,5 @@
 import React from 'react'
-import Point2D from '../../../../models/point2d'
+import Point2D from '../../../../models/Point2D'
 import ShapeItemPoint from '../point/ShapeItemPoint'
 
 //Добавить уравнение прямой

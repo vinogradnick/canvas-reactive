@@ -1,88 +1,58 @@
-import { IGroup } from "../models/IGroup";
-import { observable, action, configure, IObservableValue } from "mobx";
-import { shapeGenerator } from "../models/shape";
-import { IShape } from "../models/IShape";
-import Point2D from "../models/point2d";
+import {observable, action, configure} from "mobx";
+
+import {Group} from "../models/Group";
+import rand from "../models/rand";
+import uuid from "../models/uuid";
+import {ShapeCollection} from "../models/shapes/ShapeCollection";
 
 
-configure({ enforceActions: 'observed' })
-const shape = shapeGenerator();
+configure({enforceActions: 'observed'})
+
 export class ShapeStore {
-    static id = 1;
-    @observable layer: IGroup;
-    @observable key: IObservableValue<boolean>;
-    @observable shapes: IShape[];
-    @observable mousePosition: IObservableValue<Point2D>;
-    @observable activeGroup: { shapes: IShape[], id: number }
+    @observable group: Group;
+    @observable tempGroup: Group;
 
     constructor() {
-        // this.layer = observable({
-
-        //     name: 'page', id: 1, active: false, groups: [
-        //         {
-        //             name: 'page', id: 2, active: false, shapes: [
-        //                 shape
-        //             ],
-        //             groups: [
-        //                 {
-        //                     name: 'page', id: 2, active: false, shapes: [
-        //                         shape
-        //                     ]
-        //                 }
-        //             ]
-        //         }
-        //     ]
-        // });
-        this.shapes = observable([]);
-        this.mousePosition = observable.box(new Point2D(0, 0));
-        this.key = observable.box(false);
-        this.activeGroup = observable({ id: 1, shapes: [] })
+        this.group = observable(new Group(1));
+        this.tempGroup = observable(new Group(rand(10000)))
     }
-    @action moveShape(uuid: string, points: Point2D[]) {
 
-        const line = this.shapes.find(item => item.uuid === uuid);
-        line.points = points;
+    @action createLine = () => {
 
-    }
-    public selectedObject() {
-        const items = this.shapes.filter(({ uuid, selected }) => selected);
-        return items.length > 0;
-    }
-    @action selectObject(uuid: string) {
-        const item = this.shapes.find(item => item.uuid === uuid);
-        item.selected = !item.selected;
-    }
-    @action createLine = () =>
-        this.shapes.push(shapeGenerator())
+        const group = this.findActiveGroup(this.group);
+        if (group) {
+            this.tempGroup.children.createItem(uuid());
+            console.log(this.group.groups);
+            this.group.groups.unshift(this.tempGroup);
+            //this.tempGroup.children=new ShapeCollection();
 
-    @action removeSelected = () =>
-        this.shapes = this.shapes.filter(item => !item.selected)
-
-    recurrentSearch(id: number, group: IGroup, level: number) {
-
-    }
-    @action addToGroup(uuid: string) {
-
-        const item = this.shapes.find(item => item.uuid === uuid);
-        const itemGroup = this.activeGroup.shapes.find(item => item.uuid === uuid);
-
-        if (itemGroup !== null && itemGroup !== undefined) {
-            this.activeGroup.shapes.push(item);
-            this.shapes = this.shapes.filter(item => item.uuid !== uuid);
         }
-        console.log(this.activeGroup);
     }
-    @action destroyGroup() {
-        this.shapes.push(...this.activeGroup.shapes);
+
+    @action removeLine = () => {
+
+        const group = this.findActiveGroup(...this.group.groups);
+        if (group) {
+            this.group.children.createItem("flex");
+            //todo добавить
+        }
     }
-    @action moveGroup = (e: any) => {
-        console.log('moved');
-        // this.activeGroup.shapes.forEach(item => {
-        //     item.
-        // })
+
+    public findActiveGroup = (...groups: Group[]) => {
+        let haveChildren = [];
+        if (this.group.active) {
+            return this.group;
+        }
+        for (let i = 0; i < groups.length; i++) {
+            if (groups[i].active.get()) {
+                return groups[i];
+            } else if (groups[i].groups.length > 0) {
+                haveChildren.push(groups[i].groups);
+            }
+        }
+        return this.findActiveGroup(...haveChildren);
     }
-    @action mouseMove = (point: Point2D) => {
-        this.mousePosition.set(point);
-    }
+
 }
+
 export const gachiStore = new ShapeStore()

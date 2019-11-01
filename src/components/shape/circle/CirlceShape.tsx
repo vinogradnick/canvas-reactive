@@ -19,6 +19,7 @@ export default function CircleShape({ x, y, radius, move, down, up, color }:
             onMouseUp={e => up(e)}
             onMouseMove={e => move(e)}
             stroke={color}
+
         >
 
         </ circle>

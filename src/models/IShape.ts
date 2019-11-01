@@ -1,4 +1,4 @@
-import Point2D from "./point2d";
+import Point2D from "./Point2D";
 import { ShapeTypes } from "./ShapeTypes";
 export interface IShape {
     id?: number;
@@ -8,5 +8,7 @@ export interface IShape {
     color: string;
     strokeWidth: number;
     selected: boolean;
-    groups: number[];
+
 }
+
+

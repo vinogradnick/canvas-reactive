@@ -1,14 +1,12 @@
 import React from 'react'
-import Point2D from '../../../models/point2d';
-import { observable } from 'mobx';
 import { inject, observer } from 'mobx-react';
-import { ShapeStore } from '../../../store/shapeStore';
+import {WorkspaceStore} from "../../../store/workspaceStore";
 
-const MousePosition = inject('shapeStore')(observer(({ shapeStore }: { shapeStore?: ShapeStore }) =>
+const MousePosition = inject('workspaceStore')(observer(({ workspace }: { workspace?: WorkspaceStore }) =>
 
     <div>
-        X: {shapeStore.mousePosition.get().getX}
-        Y: {shapeStore.mousePosition.get().getY}
+        X: {workspace.mousePoint.get().getX}
+        Y: {workspace.mousePoint.get().getY}
     </div>
 ));
 

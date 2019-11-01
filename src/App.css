@@ -1,3 +1,9 @@
 .flex-inline-box {
-  display: inline-flex;
+  display: flex;
+  justify-content: flex-start;
+}
+.svg-container{
+
+  background-color: snow;
+  border-radius: 20px;
 }
