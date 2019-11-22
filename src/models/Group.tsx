@@ -1,11 +1,12 @@
-import {action, computed, IObservableValue, observable} from "mobx";
+import { action, computed, IObservableValue, observable } from "mobx";
 import ShapeGroup from "../components/shape/group/ShapeGroup";
 import React from 'react';
-import {ShapeCollection} from "./shapes/ShapeCollection";
+import { ShapeCollection } from "./shapes/ShapeCollection";
 import Point2D from './Point2D';
-import {UniversalShape} from "./UniversalShape";
+import { UniversalShape } from "./UniversalShape";
 import uuid from "./uuid";
-import {PAGE_SIZE} from "../consts/consts";
+import { PAGE_SIZE } from "../consts/consts";
+import { gachiStore } from "../store/shapeStore";
 
 interface ICoorder {
     maxX: number;
@@ -21,17 +22,17 @@ export class Group {
     @observable children: ShapeCollection;
     @observable translater: IObservableValue<string>;
 
-    constructor(private id: number, private parent?: Group) {
+    constructor(public id: number, private parent?: Group) {
         this.point = new Point2D(0, 0);
 
-        this.createRandom();
+        this.children = new ShapeCollection();
         this.translater = observable.box("");
         this.active = observable.box(false);
         this.groups = observable([]);
     }
 
     @computed get centerFigure() {
-        const {maxX, minX, maxY, minY} = this.children.maxAndMinPoint;
+        const { maxX, minX, maxY, minY } = this.children.maxAndMinPoint;
         const avX = ((maxX - minX) / 2) + minX;
         const avY = ((maxY - minY) / 2) + minY;
         return new Point2D(avX, avY);
@@ -69,7 +70,7 @@ export class Group {
                     minY = arrShapes[j].minY;
                 }
             }
-            return {minX, minY, maxX, maxY};
+            return { minX, minY, maxX, maxY };
         }
 
 
@@ -81,18 +82,15 @@ export class Group {
         return this.maxAndMinPoint;
 
     }
-    @computed get ultraCenter(){
-        const {maxX, minX, maxY, minY} = this.centerGroups;
+
+    @computed get ultraCenter() {
+        const { maxX, minX, maxY, minY } = this.centerGroups;
 
         const avX = ((maxX - minX) / 2) + minX;
         const avY = ((maxY - minY) / 2) + minY;
         return new Point2D(avX, avY);
     }
 
-    @action createRandom = () =>
-        this.children = new ShapeCollection(new UniversalShape([new Point2D(10, 10), new Point2D(100, 100)], uuid(), true, "red", 5, () => {
-        }), new UniversalShape([new Point2D(20, 20), new Point2D(120, 120)], uuid(), true, "red", 5, () => {
-        }));
 
     @action activate(status: boolean) {
         this.active.set(status);
@@ -104,11 +102,14 @@ export class Group {
     @action move = (point: Point2D) => {
 
         const delta = Point2D.subtraction(this.centerFigure, point);
-        this.groups.forEach(item => item.move(point));
         for (let i = 0; i < this.children.shapes.length; i++) {
             const item = this.children.shapes[i];
             item.points = item.points.map(p => p.minus(delta));
         }
+    }
+
+    @action find() {
+
     }
 
 
@@ -130,19 +131,23 @@ export class Group {
 
 
         return (
-            <ShapeGroup group={this}>
+            <ShapeGroup key={this.id} group={this}>
                 <>
                     {this.groups && this.groups.map(item => item.Component)}
                     {this.children && this.children.Component}
                 </>
             </ShapeGroup>)
     }
+    @action public activateGroup() {
+        this.activate(!this.active.get());
+        console.log(this.active.get())
+    }
 
     public get ListViewComponent() {
         return (
-            <ul>
-                <span
-                    onClick={e => this.activate(!this.active.get())}>{this.id} {this.centerFigure.getX} {this.centerFigure.getY}</span>
+            <ul key={uuid()}>
+                <span style={{ backgroundColor: this.active.get() ? 'red' : '' }}
+                    onClick={e => gachiStore.activate(this.id)}>{this.id} {this.centerFigure.getX} {this.centerFigure.getY}</span>
                 {this.groups && this.groups.map(item => item.ListViewComponent)}
                 {this.children && this.children.ListViewComponent}
             </ul>

@@ -1,44 +1,58 @@
-import {action, computed, observable} from "mobx";
-import {UniversalShape} from "../UniversalShape";
+import { action, computed, observable } from "mobx";
+import { UniversalShape } from "../UniversalShape";
 import React from 'react';
 import Point2D from "../Point2D";
-import {PAGE_SIZE} from "../../consts/consts";
+import { PAGE_SIZE } from "../../consts/consts";
+import rand from "../rand";
+import uuid from "../uuid";
 
 export class ShapeCollection {
     @observable selected: boolean;
     @observable shapes: UniversalShape[];
 
-    constructor(...shapes: UniversalShape[]) {
+    constructor(shapes: UniversalShape[] = []) {
         this.shapes = observable(shapes);
     }
 
 
     @action activateItem = (uuid: string) => {
-        if (!this.hasActivated) {
-            const item = this.findByUuid(uuid);
-            if (item) {
-                item.activate();
-            }
+
+        const item = this.findByUuid(uuid);
+        if (item) {
+            console.log('activated');
+            item.activate();
         }
+
     }
     @action removeItem = (id: string) => {
-        if (this.selected) {
-            this.shapes = this.shapes.filter(({uuid}) => uuid !== id);
-        }
+
+        this.shapes = this.shapes.filter(({ uuid }) => uuid !== id);
 
     }
     @action createItem = (uuid: string) => {
-        if (this.selected) {
-            //todo: добавить добавление предметов
-            this.shapes.push();
-        }
+
+
+        // @ts-ignore
+        this.shapes.push(new UniversalShape(
+            [
+                new Point2D(rand(100), rand(100)),
+                new Point2D(rand(PAGE_SIZE.WIDTH), rand(PAGE_SIZE.HEIGHT))
+            ],
+            uuid,
+            "#" + ((1 << 24) * Math.random() | 0).toString(16),
+        ));
+
     }
+    @action addItem = (shape) => this.shapes.push(shape);
     public findByUuid = (id: string) =>
-        this.shapes.find(({uuid}) => id === uuid)
+        this.shapes.find(({ uuid }) => id === uuid)
 
     get hasActivated() {
         const item = this.shapes.filter(item => item.selected);
-        return item !== undefined || item.length > 0;
+        return item;
+    }
+    @action removeActivated() {
+        this.shapes = this.shapes.filter(item => !item.selected.get());
     }
 
     get maxAndMinPoint() {
@@ -65,7 +79,7 @@ export class ShapeCollection {
                 minY = arrShapes[j].y;
             }
         }
-        return {minX, minY, maxX, maxY};
+        return { minX, minY, maxX, maxY };
 
     }
 
@@ -76,7 +90,7 @@ export class ShapeCollection {
 
     public get ListViewComponent() {
         return (<ul>
-            {this.shapes.map(item => (<li>
+            {this.shapes.map(item => (<li key={uuid()}>
                 {item.ListViewComponent}
             </li>))}
         </ul>)

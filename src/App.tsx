@@ -20,11 +20,13 @@ const App: React.FC = () => {
                         <ShapeContainer shapeStore={gachiStore}/>
                     </Workspace>
 
-                    <div>
+                    <div className="flex-mg"> 
                         <Provider workspaceStore={workspaceStore}>
                             <MousePosition workspace={workspaceStore}/>
                         </Provider>
                         <button onClick={e => gachiStore.createLine()}>Создать линию</button>
+                        <button onClick={e => gachiStore.removeLine()}>Удалить линию</button>
+
                         <Provider shapeStore={gachiStore}>
 
                             <ShapeList/>

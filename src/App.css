@@ -2,8 +2,9 @@
   display: flex;
   justify-content: flex-start;
 }
-.svg-container{
-
+.svg-container {
   background-color: snow;
-  border-radius: 20px;
+}
+.flex-mg {
+  margin: 10px;
 }

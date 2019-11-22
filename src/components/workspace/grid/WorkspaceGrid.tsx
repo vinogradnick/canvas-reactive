@@ -1,17 +1,18 @@
 import React from 'react'
 
 import './WorkspaceGrid.css';
-interface WorkspaceGridProps { width: number, height: number, size: number };
+interface WorkspaceGridProps { width: number, height: number, size: number, gridPattern: boolean };
 
-function WorkspaceGrid({ width, height, size }: WorkspaceGridProps) {
+function WorkspaceGrid({ width, height, size, gridPattern }: WorkspaceGridProps) {
     return (
         <g>
-            <defs>
+            {gridPattern && (<><defs>
                 <pattern id="smallGrid" width={size} height={size} patternUnits="userSpaceOnUse">
                     <path d={`M ${size} 0 L 0 0 0 ${size}`} fill="none" stroke="gray" strokeWidth="1" />
                 </pattern>
             </defs>
-            <rect width="100%" height="100%" fill="url(#smallGrid)" />
+                <rect width="100%" height="100%" fill="url(#smallGrid)" /></>)}
+
             <g>
                 <line x1={width / 2} y1={height / 2} x2={width / 2} y2={30} stroke="red" strokeWidth="2"
                     color="red"></line>

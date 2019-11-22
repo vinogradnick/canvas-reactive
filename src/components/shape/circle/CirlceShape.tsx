@@ -8,7 +8,7 @@ export default function CircleShape({ x, y, radius, move, down, up, color }:
         color: string,
         move?: (e: any) => void,
         down?: (e: any) => void,
-        up?: (e: any) => void
+        up?: (e: any) => void,
     }) {
     return (
         <circle

@@ -1,36 +1,58 @@
-import {observable, action, configure} from "mobx";
+import { observable, action, configure, toJS } from "mobx";
 
-import {Group} from "../models/Group";
+import { Group } from "../models/Group";
 import rand from "../models/rand";
 import uuid from "../models/uuid";
-import {ShapeCollection} from "../models/shapes/ShapeCollection";
+import { ShapeCollection } from "../models/shapes/ShapeCollection";
+import { UniversalShape } from "../models/UniversalShape";
 
 
-configure({enforceActions: 'observed'})
+configure({ enforceActions: 'observed' })
 
 export class ShapeStore {
     @observable group: Group;
     @observable tempGroup: Group;
 
+
     constructor() {
         this.group = observable(new Group(1));
-        this.tempGroup = observable(new Group(rand(10000)))
+        this.tempGroup = observable(new Group(2))
     }
 
     @action createLine = () => {
-
-        const group = this.findActiveGroup(this.group);
-        if (group) {
+        if (this.tempGroup.active.get())
             this.tempGroup.children.createItem(uuid());
-            console.log(this.group.groups);
-            this.group.groups.unshift(this.tempGroup);
-            //this.tempGroup.children=new ShapeCollection();
-
+        else
+            this.group.children.createItem(uuid());
+    }
+    @action activate(id: number) {
+        if (id === this.group.id) {
+            this.group.activate(!this.group.active.get());
+        }
+        if (id === this.tempGroup.id) {
+            this.tempGroup.activate(!this.tempGroup.active.get());
         }
     }
 
-    @action removeLine = () => {
+    @action focus = (shape: UniversalShape) => {
+        console.log('focus')
+        this.addGroup(shape);
+    }
 
+    @action public focusInGroup = (uuid: string, ...groups: Group[]) => {
+        let haveChildren = [];
+
+        for (let i = 0; i < groups.length; i++) {
+            if (groups[i].groups.length > 0) {
+                haveChildren.push(groups[i].groups);
+            }
+            console.log(groups[i].children);
+            groups[i].children.activateItem(uuid);
+        }
+        if (haveChildren.length > 0)
+            this.focusInGroup(uuid, ...haveChildren);
+    }
+    @action removeActivated() {
         const group = this.findActiveGroup(...this.group.groups);
         if (group) {
             this.group.children.createItem("flex");
@@ -38,11 +60,35 @@ export class ShapeStore {
         }
     }
 
+    @action removeLine = () => {
+
+        const collections = [this.group.children, this.tempGroup.children];
+        console.log(collections);
+        collections.forEach(item => item.removeActivated())
+    }
+    @action addGroup = (shape: UniversalShape) => {
+        this.group.children.removeItem(shape.uuid);
+        this.tempGroup.children.removeItem(shape.uuid);
+
+
+        if (this.tempGroup.active.get()) {
+            this.tempGroup.children.addItem(shape);
+            console.log('added');
+        }
+        else {
+            this.group.children.addItem(shape);
+            console.log('added');
+        }
+    }
+
+
+
     public findActiveGroup = (...groups: Group[]) => {
         let haveChildren = [];
         if (this.group.active) {
             return this.group;
         }
+
         for (let i = 0; i < groups.length; i++) {
             if (groups[i].active.get()) {
                 return groups[i];
@@ -51,6 +97,19 @@ export class ShapeStore {
             }
         }
         return this.findActiveGroup(...haveChildren);
+    }
+    public removeInGroup = (uuid: string, ...groups: Group[]) => {
+        let haveChildren = [];
+
+        for (let i = 0; i < groups.length; i++) {
+            if (groups[i].groups.length > 0) {
+                haveChildren.push(groups[i].groups);
+            }
+            console.log(groups[i].children);
+            groups[i].children.removeItem(uuid);
+        }
+        if (haveChildren.length > 0)
+            this.removeInGroup(uuid, ...haveChildren);
     }
 
 }

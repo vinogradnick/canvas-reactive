@@ -1,6 +1,7 @@
 import React from 'react'
 import Point2D from '../../../../models/Point2D'
 import ShapeItemPoint from '../point/ShapeItemPoint'
+import uuid from '../../../../models/uuid';
 
 //Добавить уравнение прямой
 
@@ -14,8 +15,8 @@ function ShapeItemLine({ points }: { points: Point2D[] }) {
             <span>
                 F(x): {xCo}x{yCo < 0 ? `${yCo}` : `+${yCo}`}y {xyCo < 0 ? `${xyCo}` : `+${xyCo}`} = 0
             </span>
-            {points && points.map((item, idx) => <li key={idx + 1}>
-                <ShapeItemPoint key={idx} point={item} />
+            {points && points.map((item, idx) => <li key={uuid()}>
+                <ShapeItemPoint key={uuid()} point={item} />
             </li>)}
         </ul>
     )

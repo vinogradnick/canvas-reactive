@@ -1,4 +1,4 @@
 export const PAGE_SIZE = {
     WIDTH: 1000,
-    HEIGHT: 500
+    HEIGHT: 800,
 }
