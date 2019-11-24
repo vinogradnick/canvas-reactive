@@ -36,7 +36,9 @@ export class ShapeStore {
 
     @action focus = (shape: UniversalShape) => {
         console.log('focus')
-        this.addGroup(shape);
+        this.focusInGroup(shape.uuid, this.group);
+        this.group.children.activateItem(shape.uuid);
+        this.tempGroup.children.activateItem(shape.uuid);
     }
 
     @action public focusInGroup = (uuid: string, ...groups: Group[]) => {
